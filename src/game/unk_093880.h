@@ -48,10 +48,12 @@ extern struct player *pPlayer;
 extern struct player_data *pPlayersPerm;
 
 void reset_play_data_ptrs(void);
-void init_player_data_ptrs_construct_viewports(int playercount);
+void init_player_data_ptrs_construct_viewports(s32 playercount);
 void sub_GAME_7F09B41C(void);
 s32 sub_GAME_7F09B528(s32 param_1);
 void set_cur_player(s32 playernum);
 s32 getPlayerCount(void);
+void set_cur_player_screen_size(u32 width, u32 height);
+void set_cur_player_viewport_size(u32 ulx, u32 uly);
 
 #endif

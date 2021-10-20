@@ -7528,13 +7528,13 @@ void reset_play_data_ptrs(void) {
     dwordptr[3] = 3;
 }
 
-
-
-
-#ifdef NONMATCHING
-void init_player_data_ptrs_construct_viewports(int playercount)
+#if NONMATCHING
+// Marxy: Matches, but makes checksum build
+// am not smart enough to know why
+// https://decomp.me/scratch/nIiBq
+void init_player_data_ptrs_construct_viewports(s32 playercount)
 {
-    int player;
+    s32 player;
 
     players[0] = NULL;
     players[1] = NULL;
@@ -7542,20 +7542,19 @@ void init_player_data_ptrs_construct_viewports(int playercount)
     players[3] = NULL;
 
     random_byte = randomGetNext() & 0xff;
-    if (playercount < 1) {
-        initBONDdataforPlayer(0);
-        set_cur_player(0);
-        set_cur_player_screen_size( viGetViewWidth(), viGetViewHeight() );
-        set_cur_player_viewport_size( viGetViewLeft(), viGetViewTop() );
-    }
-    else {
-        for (player = 0; player != playercount; player++)
+    if (playercount > 0) {
+        for (player = 0; player < playercount; player++)
         {
             initBONDdataforPlayer(player);
         }
         set_cur_player(0);
     }
-    return;
+    else {
+        initBONDdataforPlayer(0);
+        set_cur_player(0);
+        set_cur_player_screen_size( (u32)viGetViewWidth(), (u32)viGetViewHeight() );
+        set_cur_player_viewport_size( (u32)viGetViewLeft(), (u32)viGetViewTop() );
+    }
 }
 #else
 GLOBAL_ASM(
