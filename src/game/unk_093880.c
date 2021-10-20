@@ -3,6 +3,7 @@
 #include "game/unk_092E50.h"
 #include "game/bond.h"
 #include "game/lvl.h"
+#include "video.h"
 
 // bss
 s32 copyof_stagenum;
@@ -7528,9 +7529,6 @@ void reset_play_data_ptrs(void) {
     dwordptr[3] = 3;
 }
 
-#if NONMATCHING
-// Marxy: Matches, but makes checksum build
-// am not smart enough to know why
 // https://decomp.me/scratch/nIiBq
 void init_player_data_ptrs_construct_viewports(s32 playercount)
 {
@@ -7556,70 +7554,6 @@ void init_player_data_ptrs_construct_viewports(s32 playercount)
         set_cur_player_viewport_size( (u32)viGetViewLeft(), (u32)viGetViewTop() );
     }
 }
-#else
-GLOBAL_ASM(
-.text
-glabel init_player_data_ptrs_construct_viewports
-/* 0CEEBC 7F09A38C 3C028008 */  lui   $v0, %hi(players)
-/* 0CEEC0 7F09A390 24429EE0 */  addiu $v0, %lo(players) # addiu $v0, $v0, -0x6120
-/* 0CEEC4 7F09A394 27BDFFE0 */  addiu $sp, $sp, -0x20
-/* 0CEEC8 7F09A398 AFBF001C */  sw    $ra, 0x1c($sp)
-/* 0CEECC 7F09A39C AFB10018 */  sw    $s1, 0x18($sp)
-/* 0CEED0 7F09A3A0 00808825 */  move  $s1, $a0
-/* 0CEED4 7F09A3A4 AFB00014 */  sw    $s0, 0x14($sp)
-/* 0CEED8 7F09A3A8 AC400000 */  sw    $zero, ($v0)
-/* 0CEEDC 7F09A3AC AC400004 */  sw    $zero, 4($v0)
-/* 0CEEE0 7F09A3B0 AC400008 */  sw    $zero, 8($v0)
-/* 0CEEE4 7F09A3B4 0C002914 */  jal   randomGetNext
-/* 0CEEE8 7F09A3B8 AC40000C */   sw    $zero, 0xc($v0)
-/* 0CEEEC 7F09A3BC 304E00FF */  andi  $t6, $v0, 0xff
-/* 0CEEF0 7F09A3C0 3C018008 */  lui   $at, %hi(random_byte)
-/* 0CEEF4 7F09A3C4 1A20000C */  blez  $s1, .L7F09A3F8
-/* 0CEEF8 7F09A3C8 AC2EA0BC */   sw    $t6, %lo(random_byte)($at)
-/* 0CEEFC 7F09A3CC 1A200006 */  blez  $s1, .L7F09A3E8
-/* 0CEF00 7F09A3D0 00008025 */   move  $s0, $zero
-.L7F09A3D4:
-/* 0CEF04 7F09A3D4 0FC2692F */  jal   initBONDdataforPlayer
-/* 0CEF08 7F09A3D8 02002025 */   move  $a0, $s0
-/* 0CEF0C 7F09A3DC 26100001 */  addiu $s0, $s0, 1
-/* 0CEF10 7F09A3E0 1611FFFC */  bne   $s0, $s1, .L7F09A3D4
-/* 0CEF14 7F09A3E4 00000000 */   nop
-.L7F09A3E8:
-/* 0CEF18 7F09A3E8 0FC26C43 */  jal   set_cur_player
-/* 0CEF1C 7F09A3EC 00002025 */   move  $a0, $zero
-/* 0CEF20 7F09A3F0 10000018 */  b     .L7F09A454
-/* 0CEF24 7F09A3F4 8FBF001C */   lw    $ra, 0x1c($sp)
-.L7F09A3F8:
-/* 0CEF28 7F09A3F8 0FC2692F */  jal   initBONDdataforPlayer
-/* 0CEF2C 7F09A3FC 00002025 */   move  $a0, $zero
-/* 0CEF30 7F09A400 0FC26C43 */  jal   set_cur_player
-/* 0CEF34 7F09A404 00002025 */   move  $a0, $zero
-/* 0CEF38 7F09A408 0C001127 */  jal   viGetViewWidth
-/* 0CEF3C 7F09A40C 00000000 */   nop
-/* 0CEF40 7F09A410 00028400 */  sll   $s0, $v0, 0x10
-/* 0CEF44 7F09A414 00107C03 */  sra   $t7, $s0, 0x10
-/* 0CEF48 7F09A418 0C00112B */  jal   viGetViewHeight
-/* 0CEF4C 7F09A41C 01E08025 */   move  $s0, $t7
-/* 0CEF50 7F09A420 02002025 */  move  $a0, $s0
-/* 0CEF54 7F09A424 0FC26C77 */  jal   set_cur_player_screen_size
-/* 0CEF58 7F09A428 00402825 */   move  $a1, $v0
-/* 0CEF5C 7F09A42C 0C001145 */  jal   viGetViewLeft
-/* 0CEF60 7F09A430 00000000 */   nop
-/* 0CEF64 7F09A434 00028400 */  sll   $s0, $v0, 0x10
-/* 0CEF68 7F09A438 0010C403 */  sra   $t8, $s0, 0x10
-/* 0CEF6C 7F09A43C 0C001149 */  jal   viGetViewTop
-/* 0CEF70 7F09A440 03008025 */   move  $s0, $t8
-/* 0CEF74 7F09A444 02002025 */  move  $a0, $s0
-/* 0CEF78 7F09A448 0FC26C7E */  jal   set_cur_player_viewport_size
-/* 0CEF7C 7F09A44C 00402825 */   move  $a1, $v0
-/* 0CEF80 7F09A450 8FBF001C */  lw    $ra, 0x1c($sp)
-.L7F09A454:
-/* 0CEF84 7F09A454 8FB00014 */  lw    $s0, 0x14($sp)
-/* 0CEF88 7F09A458 8FB10018 */  lw    $s1, 0x18($sp)
-/* 0CEF8C 7F09A45C 03E00008 */  jr    $ra
-/* 0CEF90 7F09A460 27BD0020 */   addiu $sp, $sp, 0x20
-)
-#endif
 
 s32 getPlayerCount(void)
 {
@@ -10769,9 +10703,9 @@ weapon_multi_none:
 
 
 #ifdef NONMATCHING
+// Marxy: update func, matches but breaks checksum
 void sub_GAME_7F09B368(s32 arg0) {
-    // Node 0
-    return set_0x4_in_runtime_flags_for_item_in_guards_hand(pPlayer->unkA8->unk4, arg0);
+    set_0x4_in_runtime_flags_for_item_in_guards_hand(pPlayer->prop->chr, arg0);
 }
 
 #else
