@@ -7509,53 +7509,24 @@ glabel default_player_perspective_and_height
 
 
 
-
-#ifdef NONMATCHING
-void reset_play_data_ptrs(void)
-{
+// Marxy: so this matches and doesnt seem to cause a crash
+// but im not confident in it at all
+void reset_play_data_ptrs(void) {
+    s32 *dwordptr;
     players[0] = NULL;
-    players[1] = NULL;
-    players[2] = NULL;
-    players[3] = NULL;
+    players[1] = 0;
+    players[2] = 0;
+    players[3] = 0;
     pPlayer = NULL;
     pPlayersPerm = NULL;
     player_num = 0;
     random_byte = 0;
-    DAT_8007a0c0 = 0;
-    DAT_8007a0c4 = 1;
-    DAT_8007a0c8 = 2;
-    DAT_8007a0cc = 3;
+    dwordptr = &dword_CODE_bss_8007A0C0;
+    *dwordptr = 0;
+    dwordptr[1] = 1;
+    dwordptr[2] = 2;
+    dwordptr[3] = 3;
 }
-#else
-GLOBAL_ASM(
-.text
-glabel reset_play_data_ptrs
-/* 0CEE5C 7F09A32C 3C028008 */  lui   $v0, %hi(players)
-/* 0CEE60 7F09A330 24429EE0 */  addiu $v0, %lo(players) # addiu $v0, $v0, -0x6120
-/* 0CEE64 7F09A334 AC400000 */  sw    $zero, ($v0)
-/* 0CEE68 7F09A338 AC400004 */  sw    $zero, 4($v0)
-/* 0CEE6C 7F09A33C AC400008 */  sw    $zero, 8($v0)
-/* 0CEE70 7F09A340 AC40000C */  sw    $zero, 0xc($v0)
-/* 0CEE74 7F09A344 3C018008 */  lui   $at, %hi(pPlayer)
-/* 0CEE78 7F09A348 AC20A0B0 */  sw    $zero, %lo(pPlayer)($at)
-/* 0CEE7C 7F09A34C 3C018008 */  lui   $at, %hi(pPlayersPerm)
-/* 0CEE80 7F09A350 AC20A0B4 */  sw    $zero, %lo(pPlayersPerm)($at)
-/* 0CEE84 7F09A354 3C018008 */  lui   $at, %hi(player_num)
-/* 0CEE88 7F09A358 AC20A0B8 */  sw    $zero, %lo(player_num)($at)
-/* 0CEE8C 7F09A35C 3C038008 */  lui   $v1, %hi(dword_CODE_bss_8007A0C0)
-/* 0CEE90 7F09A360 3C018008 */  lui   $at, %hi(random_byte)
-/* 0CEE94 7F09A364 2463A0C0 */  addiu $v1, %lo(dword_CODE_bss_8007A0C0) # addiu $v1, $v1, -0x5f40
-/* 0CEE98 7F09A368 AC20A0BC */  sw    $zero, %lo(random_byte)($at)
-/* 0CEE9C 7F09A36C 240E0001 */  li    $t6, 1
-/* 0CEEA0 7F09A370 240F0002 */  li    $t7, 2
-/* 0CEEA4 7F09A374 24180003 */  li    $t8, 3
-/* 0CEEA8 7F09A378 AC600000 */  sw    $zero, ($v1)
-/* 0CEEAC 7F09A37C AC6E0004 */  sw    $t6, 4($v1)
-/* 0CEEB0 7F09A380 AC6F0008 */  sw    $t7, 8($v1)
-/* 0CEEB4 7F09A384 03E00008 */  jr    $ra
-/* 0CEEB8 7F09A388 AC78000C */   sw    $t8, 0xc($v1)
-)
-#endif
 
 
 
@@ -10939,8 +10910,39 @@ glabel sub_GAME_7F09B398
 
 
 #ifdef NONMATCHING
+// https://decomp.me/scratch/uXOhL
 void sub_GAME_7F09B41C(void) {
+    s32 temp_a0;
+    s32 temp_s0;
+    s32 temp_s0_2;
+    s32* temp_v1;
+    s32 phi_s0;
+    s32* phi_s1;
+    s32* phi_s2;
+    s32 phi_s0_2;
+    s32* phi_s1_2;
 
+    phi_s0 = 0;
+    phi_s1 = &dword_CODE_bss_8007A0C0;
+    phi_s0_2 = 0;
+    do {
+        *phi_s1 = phi_s0;
+        temp_s0 = phi_s0 + 1;
+        phi_s0 = temp_s0;
+        phi_s1 += 4;
+    } while (temp_s0 < 4);
+    phi_s2 = &dword_CODE_bss_8007A0C0;
+    phi_s1_2 = &dword_CODE_bss_8007A0C0;
+    do {
+        temp_v1 = phi_s2 + ((randomGetNext() % (u32) (4 - phi_s0_2)) * 4);
+        temp_a0 = *phi_s1_2;
+        temp_s0_2 = phi_s0_2 + 1;
+        *phi_s1_2 = *temp_v1;
+        *temp_v1 = temp_a0;
+        phi_s2 += 4;
+        phi_s0_2 = temp_s0_2;
+        phi_s1_2 += 4;
+    } while (temp_s0_2 != 3);
 }
 #else
 GLOBAL_ASM(
